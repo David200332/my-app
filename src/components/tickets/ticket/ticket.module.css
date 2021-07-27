@@ -1,0 +1,48 @@
+.wapper {
+    height: auto;
+    width: 100%;
+    background-color: white;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.carrier img {
+    height: 80px;
+    width: 100px;
+}
+
+.price{
+    font-size: 28px;
+    color: #289af3;
+    font-weight: 500;
+}
+.content {
+    padding: 0 20px 30px 20px;
+}
+.upper_content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.constent_segment_1 {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.constent_segment_2 {
+    display: flex;
+    justify-content: space-between;
+}
+
+.content_date :first-child {
+    color: #aebcc3;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.content_date :last-child {
+    font-size: 16px;
+    font-weight: 500;
+}
