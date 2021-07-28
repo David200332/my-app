@@ -24,11 +24,7 @@ function App() {
 }, [state, loading])
 
   useEffect(() => {
-    if(filterState.length === 0){
-      setFilterState(["Все"])
-    }
-  
-    if(filterState.length === 4){
+    if(filterState.length === 0 || filterState.length === 4){
       setFilterState(["Все"])
     }
     
