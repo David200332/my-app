@@ -12,7 +12,6 @@ function Tickets({tickets}){
             </div>
         ))
     }
-    
 
     return (
         <div className={style.size}>

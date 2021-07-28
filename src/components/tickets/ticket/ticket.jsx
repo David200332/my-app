@@ -55,7 +55,6 @@ function Ticket({el}){
                                 <p>{el.segments[1].stops.length} пересадки</p>
                                 <p> { el.segments[1].stops.toString()} </p>
                             </div>
-                            {console.log(new Date('2021-08-25T09:59:00.000Z'))}
                         </div>
                     </div> 
                     </div>

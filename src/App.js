@@ -9,7 +9,7 @@ import Tickets from "./components/tickets/tickets.jsx"
 function App() {
   const [state, setState] = useState('sort_by_price');
   const menuState = ["Все",  "Без пересадок" ,  "1 пересадка", "2 пересадки", "3 пересадки"];
-  const [filterState, setFilterState] = useState([])
+  const [filterState, setFilterState] = useState(["Все"])
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [test, setTest] = useState(false); 
@@ -22,6 +22,23 @@ function App() {
     loading && sortTickets(state)
     setTest(!test)
 }, [state, loading])
+
+  useEffect(() => {
+    if(filterState.length === 0){
+      setFilterState(["Все"])
+    }
+  
+    if(filterState.length === 4){
+      setFilterState(["Все"])
+    }
+    
+    if(filterState.includes("Все") && filterState.length >= 1){
+      let index = filterState.indexOf("Все")
+      filterState.splice(index, 1)
+      setFilterState(() => filterState)
+    }
+
+  }, [filterState])
 
   const checkboxHandler = ({ target: { checked, value } }) => {
     setFilterState((!filterState.includes(value) && checked)
@@ -44,7 +61,6 @@ function App() {
   }
 
   function sortTickets(data){
-    console.log(tickets)
     if(data === "sort_by_price") setTickets(() => tickets.sort((a, b) => a.price > b.price ? 1 : -1))
     if(data === "sort_by_time") setTickets(() => tickets.sort((a, b) => a.segments[0].duration > b.segments[0].duration  ? 1 : -1))
   }
@@ -52,23 +68,24 @@ function App() {
    const filter = tickets.filter(n => (!filterState.length || filterCheck(filterState, n)))
 
   function filterCheck(data, el){
+    const temp = el.segments[0].stops.length;
     if(data.includes("Все")){
-      return  el.segments[0].stops.length < 10
+      return  true
     }
-    if(data.includes("Без пересадок")){
-      return  el.segments[0].stops.length === 0
-    }
-
-    if(data.includes("1 пересадка")){
-      return el.segments[0].stops.length === 1
+    if(data.includes("Без пересадок") && temp === 0){
+      return  true
     }
 
-    if(data.includes("2 пересадки")){
-      return el.segments[0].stops.length === 2
+    if(data.includes("1 пересадка") && temp === 1){
+      return true
     }
 
-    if(data.includes("3 пересадки")){
-      return el.segments[0].stops.length === 3
+    if(data.includes("2 пересадки") && temp === 2){
+      return true
+    }
+
+    if(data.includes("3 пересадки") && temp === 3){
+      return true
     }
 
   }
