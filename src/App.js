@@ -5,11 +5,12 @@ import React, {useState, useEffect} from 'react';
 import Sort from "./components/sort/sort.jsx"
 import Filter from "./components/filter/filter.jsx"
 import Tickets from "./components/tickets/tickets.jsx"
+import Loading from './components/loading/loading.jsx';
 
 function App() {
   const [state, setState] = useState('sort_by_price');
   const menuState = ["Все",  "Без пересадок" ,  "1 пересадка", "2 пересадки", "3 пересадки"];
-  const [filterState, setFilterState] = useState(["Все"])
+  const [filterState, setFilterState] = useState([])
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [test, setTest] = useState(false); 
@@ -27,11 +28,10 @@ function App() {
     if(filterState.length === 0 || filterState.length === 4){
       setFilterState(["Все"])
     }
-    
-    if(filterState.includes("Все") && filterState.length >= 1){
+      
+    if(filterState.includes("Все") && filterState.length > 1){
       let index = filterState.indexOf("Все")
-      filterState.splice(index, 1)
-      setFilterState(() => filterState)
+      setFilterState((prev) => prev.splice(index, 1))
     }
 
   }, [filterState])
@@ -50,7 +50,7 @@ function App() {
             const res_second = await axios.get(`https://front-test.beta.aviasales.ru/tickets?searchId=${res.data.searchId}`) 
             setTickets(res_second.data.tickets.splice(0, 10))
             setLoading(true)
-        }, 100)
+        }, 6000)
     } catch(e){
         console.log(e)
     }
@@ -61,13 +61,15 @@ function App() {
     if(data === "sort_by_time") setTickets(() => tickets.sort((a, b) => a.segments[0].duration > b.segments[0].duration  ? 1 : -1))
   }
 
-   const filter = tickets.filter(n => (!filterState.length || filterCheck(filterState, n)))
+   const filter = tickets.filter(n => filterCheck(filterState, n))
 
   function filterCheck(data, el){
     const temp = el.segments[0].stops.length;
+
     if(data.includes("Все")){
       return  true
     }
+    
     if(data.includes("Без пересадок") && temp === 0){
       return  true
     }
@@ -84,7 +86,10 @@ function App() {
       return true
     }
 
+    return false
+
   }
+
   function buttonHandler(data){
     setState(data)
   }
@@ -93,7 +98,6 @@ function App() {
     buttonHandler,
     state
   }
-
 
   return (
     <div className="container">
@@ -106,7 +110,7 @@ function App() {
         </div>
         <div className="content__right">
           <Sort data={data}></Sort>
-          <Tickets tickets={filter}></Tickets>
+          {!loading ? <Loading /> : <Tickets tickets={filter} />}
         </div>
       </div>
     </div>
