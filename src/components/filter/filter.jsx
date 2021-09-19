@@ -1,8 +1,7 @@
-import React, {useState, useEffect} from 'react';
+import React  from 'react';
 import style from './filter.module.css';
 
-function Filter({ value, onChange, sizes }){
-
+function Filter({ filterState, onChange, sizes }){
     return (
         <div className={style.wapper}>
             <div className={style.content}>
@@ -11,12 +10,18 @@ function Filter({ value, onChange, sizes }){
                 </div>
                 <div className={style.buttons}>
                     <form>
+                    <div className={style.checkbox}>
+                                 <label className={style.container}>
+                                    <input  className={style.checkbox} type="checkbox" checked={!filterState.length} onChange={onChange}/>
+                                    <span className={style.checkmark}></span>
+                                   <p>Все</p></label>
+                                </div>
                         {sizes.map( (n, index) => {
                             return <div key={index} className={style.checkbox}>
                                  <label className={style.container}>
-                                    <input  className={style.checkbox} type="checkbox" value={n} checked={value.includes(n)} onChange={onChange}/>
+                                    <input  className={style.checkbox} type="checkbox" value={n.value} checked={filterState.includes(n.value)} onChange={onChange}/>
                                     <span className={style.checkmark}></span>
-                                   <p>{n}</p></label>
+                                   <p>{n.name}</p></label>
                                 </div>
                         })}
                     </form>

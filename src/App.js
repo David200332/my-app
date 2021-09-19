@@ -1,108 +1,78 @@
 import logo from './logo.png';
 import './App.css';
-import axios from 'axios';
 import React, {useState, useEffect} from 'react';
 import Sort from "./components/sort/sort.jsx"
 import Filter from "./components/filter/filter.jsx"
 import Tickets from "./components/tickets/tickets.jsx"
 import Loading from './components/loading/loading.jsx';
 
+import {getrequest} from './helpers/index'
+
 function App() {
   const [state, setState] = useState('sort_by_price');
-  const menuState = ["Все",  "Без пересадок" ,  "1 пересадка", "2 пересадки", "3 пересадки"];
-  const [filterState, setFilterState] = useState([])
+  const menuState = [
+    {
+      name : "Без пересадок",
+      value : "0"
+    },
+    {
+      name : "1 пересадка",
+      value : "1"
+    },
+    {
+      name : "2 пересадки",
+      value : "2"
+    },
+    {
+      name : "3 пересадки",
+      value : "3"
+    }
+  ]
+
   const [tickets, setTickets] = useState([]);
+  const [filterState, setFilterState] = useState([])
   const [loading, setLoading] = useState(false);
+
   const [test, setTest] = useState(false); 
 
   useEffect(() => {
-    getrequest()
+    getrequest(setTickets, setLoading)
   }, [])
 
   useEffect(() => {
     loading && sortTickets(state)
-    setTest(!test)
+    setTest(!test) //!!!!!!
 }, [state, loading])
 
   useEffect(() => {
-    if(filterState.length === 0 || filterState.length === 4){
-      setFilterState(["Все"])
+    if(filterState.length === 4){
+      setFilterState([])
     }
-      
-    if(filterState.includes("Все") && filterState.length > 1){
-      let index = filterState.indexOf("Все")
-      setFilterState((prev) => prev.splice(index, 1))
-    }
-
   }, [filterState])
 
   const checkboxHandler = ({ target: { checked, value } }) => {
     setFilterState((!filterState.includes(value) && checked)
       ? [ ...filterState, value ]
       : filterState.filter(n => n !== value)
-    );
-  };
-
-  function getrequest(){
-    try{    
-        setTimeout( async () => {
-            const res =  await axios.get(`https://front-test.beta.aviasales.ru/search`)
-            const res_second = await axios.get(`https://front-test.beta.aviasales.ru/tickets?searchId=${res.data.searchId}`).catch(err => {
-              if(err.response.status === 500){
-                getrequest()
-              }
-              throw err
-            })
-            setTickets(res_second.data.tickets.splice(0, 10))
-            setLoading(true)
-        }, 3000)
-    } catch(err){
-      console.log(err)
-    }
+    )
   }
 
-  function sortTickets(data){
+  const  sortTickets = (data) => {
     if(data === "sort_by_price") setTickets(() => tickets.sort((a, b) => a.price > b.price ? 1 : -1))
     if(data === "sort_by_time") setTickets(() => tickets.sort((a, b) => a.segments[0].duration > b.segments[0].duration  ? 1 : -1))
   }
 
-   const filter = tickets.filter(n => filterCheck(filterState, n))
+  const filterCheck = (data, el) => {
+    const temp = el.segments[0].stops.length.toString();
 
-  function filterCheck(data, el){
-    const temp = el.segments[0].stops.length;
-
-    if(data.includes("Все")){
+    if(filterState.length === 0 || data.includes(temp)){
       return  true
-    }
-    
-    if(data.includes("Без пересадок") && temp === 0){
-      return  true
-    }
-
-    if(data.includes("1 пересадка") && temp === 1){
-      return true
-    }
-
-    if(data.includes("2 пересадки") && temp === 2){
-      return true
-    }
-
-    if(data.includes("3 пересадки") && temp === 3){
-      return true
     }
 
     return false
-
   }
 
-  function buttonHandler(data){
-    setState(data)
-  }
-
-  const data = {
-    buttonHandler,
-    state
-  }
+  const filter = tickets.filter(n => filterCheck(filterState, n))
 
   return (
     <div className="container">
@@ -111,10 +81,10 @@ function App() {
       </div>
       <div className="content">
         <div className="content__left">
-          <Filter value={filterState} onChange={checkboxHandler} sizes={menuState}></Filter>
+          <Filter filterState={filterState} onChange={checkboxHandler} sizes={menuState}></Filter>
         </div>
         <div className="content__right">
-          <Sort data={data}></Sort>
+          <Sort buttonHandler={setState} state={state}></Sort>
           {!loading ? <Loading /> : <Tickets tickets={filter} />}
         </div>
       </div>
@@ -123,3 +93,4 @@ function App() {
 }
 
 export default App;
+
